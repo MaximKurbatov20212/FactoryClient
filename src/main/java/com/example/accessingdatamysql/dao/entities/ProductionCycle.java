@@ -1,0 +1,22 @@
+package com.example.accessingdatamysql.dao.entities;
+
+import jakarta.persistence.*;
+
+
+@Entity // This tells Hibernate to make a table out of this class
+@AllArgsConstructor
+@NoArgsConstructor
+@Getter
+@Setter
+public class ProductionCycle {
+    @Id
+    @GeneratedValue(strategy= GenerationType.SEQUENCE)
+    private Integer id;
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Product product;
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Site site;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Brigade brigade;
+}
