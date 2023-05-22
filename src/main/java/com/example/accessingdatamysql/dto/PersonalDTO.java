@@ -12,7 +12,6 @@ import java.util.List;
 public class PersonalDTO {
     @NotNull
     private Integer id;
-    @NotNull
     private PersonalFunction function;
     @NotNull
     private PersonalCategory category;

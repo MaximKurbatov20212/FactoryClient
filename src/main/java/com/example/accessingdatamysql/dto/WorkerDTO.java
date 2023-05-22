@@ -12,7 +12,6 @@ public class WorkerDTO {
     @NotNull
 
     private Brigade brigade;
-    @NotNull
     private WorkerFunction function;
     @NotNull
     private WorkerCategory category;
