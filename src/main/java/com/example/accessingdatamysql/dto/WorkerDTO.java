@@ -3,7 +3,6 @@ package com.example.accessingdatamysql.dto;
 import com.example.accessingdatamysql.dao.entities.Brigade;
 import com.example.accessingdatamysql.dao.entities.WorkerCategory;
 import com.example.accessingdatamysql.dao.entities.WorkerFunction;
-import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 
 public class WorkerDTO {

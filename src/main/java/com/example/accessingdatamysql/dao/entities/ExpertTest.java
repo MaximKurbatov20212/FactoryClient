@@ -1,4 +1,5 @@
 package com.example.accessingdatamysql.dao.entities;
+
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -11,13 +12,16 @@ import lombok.Setter;
 @Getter
 @Setter
 public class ExpertTest {
+//    @Id
+
     @Id
-    @ManyToOne(fetch = FetchType.LAZY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Integer id;
 
+    @ManyToOne(fetch = FetchType.LAZY)
     private ProductTest test;
 
-    @Id
+//    @Id
     @ManyToOne(fetch = FetchType.LAZY)
     private Expert expert;
 }

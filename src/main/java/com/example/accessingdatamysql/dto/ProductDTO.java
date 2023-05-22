@@ -1,7 +1,7 @@
 package com.example.accessingdatamysql.dto;
 
-import com.example.accessingdatamysql.dao.entities.*;
-import jakarta.persistence.*;
+import com.example.accessingdatamysql.dao.entities.ProductAttributeValue;
+import com.example.accessingdatamysql.dao.entities.ProductionCycle;
 import jakarta.validation.constraints.NotNull;
 
 import java.util.ArrayList;

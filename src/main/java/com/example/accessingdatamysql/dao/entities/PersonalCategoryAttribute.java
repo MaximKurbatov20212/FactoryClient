@@ -18,6 +18,7 @@ public class PersonalCategoryAttribute {
     @Id
     @GeneratedValue(strategy= GenerationType.SEQUENCE)
     private Integer id;
+    private String attributeName;
 
     @ManyToOne(fetch = FetchType.LAZY)
     PersonalCategory category;

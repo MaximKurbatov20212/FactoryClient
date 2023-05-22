@@ -14,6 +14,7 @@ import java.util.List;
 @NoArgsConstructor
 @Getter
 @Setter
+@Table(name="Personal")
 public class Personal {
     @Id
     @GeneratedValue(strategy= GenerationType.SEQUENCE)
@@ -30,4 +31,8 @@ public class Personal {
 
     @OneToMany(mappedBy = "person", cascade = CascadeType.ALL, orphanRemoval = true)
     List<PersonalAttributeValue> personalAttributeValues = new ArrayList<>();
+
+    @OneToMany(mappedBy = "person", cascade = CascadeType.ALL, orphanRemoval = true)
+    List<PersonalAccounting> personalAccountings = new ArrayList<>();
+    // personal accounting
 }

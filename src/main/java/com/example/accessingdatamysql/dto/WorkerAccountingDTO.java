@@ -2,7 +2,6 @@ package com.example.accessingdatamysql.dto;
 
 import com.example.accessingdatamysql.dao.entities.EventWithPeople;
 import com.example.accessingdatamysql.dao.entities.Worker;
-import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 
 import java.sql.Date;

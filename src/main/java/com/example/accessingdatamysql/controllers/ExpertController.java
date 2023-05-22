@@ -14,7 +14,7 @@ public class ExpertController {
     @Autowired
     private ExpertRepository expertRepository;
 
-    @PostMapping(path="/expertTest")
+    @PostMapping(path="/expert")
     public @ResponseBody String add (@RequestParam String name) {
         return "Saved";
     }

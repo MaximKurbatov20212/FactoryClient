@@ -14,6 +14,7 @@ import java.util.List;
 @NoArgsConstructor
 @Getter
 @Setter
+@Table(name="Sites")
 public class Site {
     @Id
     @GeneratedValue(strategy= GenerationType.SEQUENCE)
@@ -25,4 +26,7 @@ public class Site {
 
     @OneToMany(mappedBy = "site", cascade = CascadeType.ALL, orphanRemoval = true)
     List<Brigade> brigades = new ArrayList<>();
+
+    @OneToMany(mappedBy = "site", cascade = CascadeType.ALL, orphanRemoval = true)
+    List<ProductionCycle> productionCycles = new ArrayList<>();
 }

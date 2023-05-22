@@ -4,7 +4,6 @@ import com.example.accessingdatamysql.dao.entities.PersonalAttributeValue;
 import com.example.accessingdatamysql.dao.entities.PersonalCategory;
 import com.example.accessingdatamysql.dao.entities.PersonalFunction;
 import com.example.accessingdatamysql.dao.entities.Workshop;
-import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 
 import java.util.ArrayList;

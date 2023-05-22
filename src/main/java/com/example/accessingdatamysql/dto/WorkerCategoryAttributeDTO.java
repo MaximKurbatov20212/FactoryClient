@@ -2,7 +2,6 @@ package com.example.accessingdatamysql.dto;
 
 import com.example.accessingdatamysql.dao.entities.WorkerAttributeValue;
 import com.example.accessingdatamysql.dao.entities.WorkerCategory;
-import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 
 import java.util.ArrayList;

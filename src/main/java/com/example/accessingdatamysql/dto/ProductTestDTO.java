@@ -4,7 +4,6 @@ import com.example.accessingdatamysql.dao.entities.ExpertTest;
 import com.example.accessingdatamysql.dao.entities.Laboratory;
 import com.example.accessingdatamysql.dao.entities.Product;
 import com.example.accessingdatamysql.dao.entities.TestEquipment;
-import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 
 import java.util.ArrayList;

@@ -20,4 +20,5 @@ public class TestEquipment {
 
     @ManyToOne(fetch = FetchType.LAZY)
     private Equipment equipment;
+
 }

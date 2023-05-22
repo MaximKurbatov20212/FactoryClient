@@ -14,7 +14,7 @@ public class WorkerCategoryAttributeController {
     @Autowired
     private WorkerCategoryAttributeRepository workerCategoryAttributeRepository;
 
-    @PostMapping(path = "/workerCategory") // Map ONLY POST Requests
+    @PostMapping(path = "/workerCategoryAttribute") // Map ONLY POST Requests
     public @ResponseBody String add(@RequestParam String name) {
         return "Saved";
     }

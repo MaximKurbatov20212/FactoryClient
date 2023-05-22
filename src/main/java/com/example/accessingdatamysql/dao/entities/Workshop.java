@@ -14,6 +14,8 @@ import java.util.List;
 @NoArgsConstructor
 @Getter
 @Setter
+
+@Table(name="Workshop")
 public class Workshop {
 	@Id
 	@GeneratedValue(strategy=GenerationType.SEQUENCE)
@@ -29,4 +31,7 @@ public class Workshop {
 
 	@OneToMany(mappedBy = "workshop", cascade = CascadeType.ALL, orphanRemoval = true)
 	List<Site> sites = new ArrayList<>();
+
+	@OneToMany(mappedBy = "workshop", cascade = CascadeType.ALL, orphanRemoval = true)
+	List<Product> products = new ArrayList<>();
 }

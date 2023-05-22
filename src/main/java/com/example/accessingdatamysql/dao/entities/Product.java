@@ -15,6 +15,8 @@ import java.util.List;
 @Getter
 @Setter
 public class Product {
+    @Id
+    @GeneratedValue(strategy= GenerationType.SEQUENCE)
     private Integer id;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -30,5 +32,5 @@ public class Product {
     List<ProductionCycle> productionCycles = new ArrayList<>();
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
-    List<ProductAttributeValue> personalAttributeValues = new ArrayList<>();
+    List<ProductAttributeValue> productAttributeValues = new ArrayList<>();
 }

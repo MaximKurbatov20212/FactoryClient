@@ -2,7 +2,6 @@ package com.example.accessingdatamysql.dto;
 
 import com.example.accessingdatamysql.dao.entities.Equipment;
 import com.example.accessingdatamysql.dao.entities.ProductTest;
-import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 
 public class TestEquipmentDTO {

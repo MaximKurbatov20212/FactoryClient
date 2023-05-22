@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,7 +17,11 @@ import java.util.List;
 @Getter
 @Setter
 public class ProductTest {
+    @Id
+    @GeneratedValue(strategy= GenerationType.SEQUENCE)
     private Integer id;
+
+    private Date date;
 
     @ManyToOne(fetch = FetchType.LAZY)
     private Laboratory laboratory;
