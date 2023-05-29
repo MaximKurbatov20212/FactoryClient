@@ -4,6 +4,9 @@ import com.example.accessingdatamysql.dao.repo.TestEquipmentRepository;
 import com.example.accessingdatamysql.dto.EquipmentDTO;
 import com.example.accessingdatamysql.dto.ProductTestDTO;
 import com.example.accessingdatamysql.dto.TestEquipmentDTO;
+import com.example.accessingdatamysql.exception.ItemException;
+import com.example.accessingdatamysql.service.TestEquipmentService;
+import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.TableView;
@@ -28,11 +31,78 @@ public class TestEquipmentController {
     @FXML private TableView<ProductTestDTO> productTestTable;
     @FXML private TableView<TestEquipmentDTO> testEquipmentTable;
 
-    @Autowired
-    private TestEquipmentRepository testEquipmentRepository;
+    private final TestEquipmentService testEquipmentService;
 
-    @PostMapping(path = "/testEquipment") // Map ONLY POST Requests
-    public @ResponseBody String add(@RequestParam String name) {
-        return "Saved";
+    public TestEquipmentController(TestEquipmentService service) {
+        this.testEquipmentService = service;
     }
+
+    private void clickButton() {
+        add.setOnAction(event -> addEvent());
+        edit.setOnAction(event -> editEvent());
+        drop.setOnAction(event -> dropEvent());
+    }
+
+    private void dropEvent() {
+        TestEquipmentDTO item = testEquipmentTable.getSelectionModel().getSelectedItem();
+        if (item == null) {
+            throw new ItemException("select record");
+        }
+
+        testEquipmentService.drop(item);
+        testEquipmentTable.setItems(FXCollections.observableList(testEquipmentService.getAll()));
+    }
+
+    private void editEvent() {
+        TestEquipmentDTO testEquipmentItem = testEquipmentTable.getSelectionModel().getSelectedItem();
+        if (testEquipmentItem == null) {
+            throw new ItemException("select testEquipment");
+        }
+
+        EquipmentDTO eqItem = equipmentsTable.getSelectionModel().getSelectedItem();
+        if (eqItem == null) {
+            throw new ItemException("select expert");
+        }
+
+        ProductTestDTO productTestItem = productTestTable.getSelectionModel().getSelectedItem();
+        if (productTestItem == null) {
+            throw new ItemException("select productTest");
+        }
+
+        testEquipmentService.edit(TestEquipmentDTO.builder()
+                .id(testEquipmentItem.getId())
+                .equipment(eqItem)
+                .test(productTestItem)
+                .build());
+        testEquipmentTable.setItems(FXCollections.observableList(testEquipmentService.getAll()));
+    }
+
+    private void addEvent() {
+        try {
+            TestEquipmentDTO testEquipmentItem = testEquipmentTable.getSelectionModel().getSelectedItem();
+            if (testEquipmentItem == null) {
+                throw new ItemException("select testEquipment");
+            }
+
+            EquipmentDTO eqItem = equipmentsTable.getSelectionModel().getSelectedItem();
+            if (eqItem == null) {
+                throw new ItemException("select expert");
+            }
+
+            ProductTestDTO productTestItem = productTestTable.getSelectionModel().getSelectedItem();
+            if (productTestItem == null) {
+                throw new ItemException("select productTest");
+            }
+
+            testEquipmentService.add(TestEquipmentDTO.builder()
+                    .id(testEquipmentItem.getId())
+                    .equipment(eqItem)
+                    .test(productTestItem)
+                    .build());
+            testEquipmentTable.setItems(FXCollections.observableList(testEquipmentService.getAll()));
+        } catch (Exception e) {
+            System.err.println("factory add error");
+        }
+    }
+
 }

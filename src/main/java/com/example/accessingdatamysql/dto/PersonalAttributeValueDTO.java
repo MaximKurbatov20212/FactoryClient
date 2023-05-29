@@ -3,6 +3,15 @@ package com.example.accessingdatamysql.dto;
 import com.example.accessingdatamysql.dao.entities.Personal;
 import com.example.accessingdatamysql.dao.entities.PersonalCategoryAttribute;
 import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 
 public class PersonalAttributeValueDTO {
     @NotNull
@@ -11,7 +20,7 @@ public class PersonalAttributeValueDTO {
     private String value;
 
     @NotNull
-    private Personal person;
+    private PersonalDTO person;
     @NotNull
-    private PersonalCategoryAttribute attribute;
+    private PersonalCategoryAttributeDTO attribute;
 }

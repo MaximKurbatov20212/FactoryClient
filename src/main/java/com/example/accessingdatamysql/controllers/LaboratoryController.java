@@ -1,36 +1,69 @@
 package com.example.accessingdatamysql.controllers;
 
-import com.example.accessingdatamysql.dao.repo.LaboratoryRepository;
-import com.example.accessingdatamysql.dto.EquipmentDTO;
 import com.example.accessingdatamysql.dto.LaboratoryDTO;
+import com.example.accessingdatamysql.exception.ItemException;
+import com.example.accessingdatamysql.service.LaboratoryService;
+import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import net.rgielen.fxweaver.core.FxmlView;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 
 @Component
 @FxmlView("Laboratories.fxml")
 public class LaboratoryController {
     @FXML
     private Button add;
-    @FXML private Button edit;
-    @FXML private Button drop;
-    @FXML private TextField name;
-    @FXML private TableView<LaboratoryDTO> laboratoriesTable;
+    @FXML
+    private Button edit;
+    @FXML
+    private Button drop;
+    @FXML
+    private TextField name;
+    @FXML
+    private TableView<LaboratoryDTO> laboratoriesTable;
 
-    @Autowired
-    private LaboratoryRepository laboratoryRepository;
+    private final LaboratoryService laboratoryService;
 
-    @PostMapping(path="/laboratory")
-    public @ResponseBody String add (@RequestParam String name) {
-        return "Saved";
+    public LaboratoryController(LaboratoryService service) {
+        this.laboratoryService = service;
+    }
+
+    private void clickButton() {
+        add.setOnAction(event -> addEvent());
+        edit.setOnAction(event -> editEvent());
+        drop.setOnAction(event -> dropEvent());
+    }
+
+    private void dropEvent() {
+        LaboratoryDTO item = laboratoriesTable.getSelectionModel().getSelectedItem();
+        if (item == null) {
+            throw new ItemException("select record");
+        }
+
+        laboratoryService.drop(item);
+        laboratoriesTable.setItems(FXCollections.observableList(laboratoryService.getAll()));
+    }
+
+    private void editEvent() {
+        LaboratoryDTO item = laboratoriesTable.getSelectionModel().getSelectedItem();
+        if (item == null) {
+            throw new ItemException("select record");
+        }
+
+        laboratoryService.edit(LaboratoryDTO.builder().name(name.getText()).build());
+        laboratoriesTable.setItems(FXCollections.observableList(laboratoryService.getAll()));
+    }
+
+    private void addEvent() {
+        try {
+            LaboratoryDTO item = LaboratoryDTO.builder().name(name.getText()).build();
+            laboratoryService.add(item);
+            laboratoriesTable.setItems(FXCollections.observableList(laboratoryService.getAll()));
+        } catch (Exception e) {
+            System.err.println("laboratory add error");
+        }
     }
 }

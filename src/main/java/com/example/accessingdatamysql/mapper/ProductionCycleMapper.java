@@ -2,10 +2,14 @@ package com.example.accessingdatamysql.mapper;
 
 import com.example.accessingdatamysql.dao.entities.ProductionCycle;
 import com.example.accessingdatamysql.dto.ProductionCycleDTO;
+import org.mapstruct.InjectionStrategy;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.ReportingPolicy;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel="spring",
+        injectionStrategy = InjectionStrategy.CONSTRUCTOR,
+        unmappedTargetPolicy = ReportingPolicy.WARN)
 public interface ProductionCycleMapper {
 
     @Mapping(target = "id", source = "id")

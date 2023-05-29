@@ -20,8 +20,19 @@ public class Factory {
     @GeneratedValue(strategy= GenerationType.SEQUENCE)
     private Integer id;
 
+    private String name;
+
     @OneToMany(mappedBy = "factory", cascade = CascadeType.ALL, orphanRemoval = true)
     List<Workshop> workshops = new ArrayList<>();
+
+    public Factory(String text) {
+        this.name = text;
+    }
+
+    public Factory(int i, String text) {
+        id = i;
+        name = text;
+    }
 
     public void addWorkshop(Workshop workshop) {
         workshops.add(workshop);

@@ -1,36 +1,69 @@
 package com.example.accessingdatamysql.controllers;
 
-import com.example.accessingdatamysql.dao.repo.ProductTypeRepository;
-import com.example.accessingdatamysql.dto.EquipmentDTO;
 import com.example.accessingdatamysql.dto.ProductTypeDTO;
+import com.example.accessingdatamysql.exception.ItemException;
+import com.example.accessingdatamysql.service.ProductTypeService;
+import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import net.rgielen.fxweaver.core.FxmlView;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 
 @Component
 @FxmlView("ProductsTypes.fxml")
 public class ProductTypeController {
     @FXML
     private Button add;
-    @FXML private Button edit;
-    @FXML private Button drop;
-    @FXML private TextField name;
-    @FXML private TableView<ProductTypeDTO> productTypesTable;
+    @FXML
+    private Button edit;
+    @FXML
+    private Button drop;
+    @FXML
+    private TextField name;
+    @FXML
+    private TableView<ProductTypeDTO> productTypesTable;
 
-    @Autowired
-    private ProductTypeRepository productTypeRepository;
+    private final ProductTypeService productTypeService;
 
-    @PostMapping(path = "/productType") // Map ONLY POST Requests
-    public @ResponseBody String add(@RequestParam String name) {
-        return "Saved";
+    public ProductTypeController(ProductTypeService service) {
+        this.productTypeService = service;
+    }
+
+    private void clickButton() {
+        add.setOnAction(event -> addEvent());
+        edit.setOnAction(event -> editEvent());
+        drop.setOnAction(event -> dropEvent());
+    }
+
+    private void dropEvent() {
+        ProductTypeDTO item = productTypesTable.getSelectionModel().getSelectedItem();
+        if (item == null) {
+            throw new ItemException("select record");
+        }
+
+        productTypeService.drop(item);
+        productTypesTable.setItems(FXCollections.observableList(productTypeService.getAll()));
+    }
+
+    private void editEvent() {
+        ProductTypeDTO item = productTypesTable.getSelectionModel().getSelectedItem();
+        if (item == null) {
+            throw new ItemException("select record");
+        }
+
+        productTypeService.edit(ProductTypeDTO.builder().name(name.getText()).build());
+        productTypesTable.setItems(FXCollections.observableList(productTypeService.getAll()));
+    }
+
+    private void addEvent() {
+        try {
+            ProductTypeDTO item = ProductTypeDTO.builder().name(name.getText()).build();
+            productTypeService.add(item);
+            productTypesTable.setItems(FXCollections.observableList(productTypeService.getAll()));
+        } catch (Exception e) {
+            System.err.println("factory add error");
+        }
     }
 }

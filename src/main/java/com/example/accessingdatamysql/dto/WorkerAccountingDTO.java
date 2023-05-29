@@ -1,12 +1,17 @@
 package com.example.accessingdatamysql.dto;
 
-import com.example.accessingdatamysql.dao.entities.EventWithPeople;
-import com.example.accessingdatamysql.dao.entities.Worker;
 import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-import java.sql.Date;
-import java.sql.Time;
+import java.util.Date;
 
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class WorkerAccountingDTO {
 
     @NotNull
@@ -14,10 +19,7 @@ public class WorkerAccountingDTO {
     @NotNull
     private Date data;
     @NotNull
-    private Time time;
+    private WorkerDTO person;
     @NotNull
-
-    private Worker person;
-    @NotNull
-    private EventWithPeople event;
+    private EventWithPeopleDTO event;
 }

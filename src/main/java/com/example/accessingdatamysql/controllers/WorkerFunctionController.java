@@ -1,21 +1,16 @@
 package com.example.accessingdatamysql.controllers;
 
-import com.example.accessingdatamysql.dao.entities.WorkerFunction;
-import com.example.accessingdatamysql.dao.repo.WorkerFunctionRepository;
-import com.example.accessingdatamysql.dto.EquipmentDTO;
 import com.example.accessingdatamysql.dto.WorkerFunctionDTO;
+import com.example.accessingdatamysql.exception.ItemException;
+import com.example.accessingdatamysql.service.WorkerFunctionService;
+import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import net.rgielen.fxweaver.core.FxmlView;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+
 
 @Component
 @FxmlView("WorkerFunctions.fxml")
@@ -26,11 +21,46 @@ public class WorkerFunctionController {
     @FXML private Button drop;
     @FXML private TextField name;
     @FXML private TableView<WorkerFunctionDTO> workerFunctionsTable;
-    @Autowired
-    private WorkerFunctionRepository workerFunctionRepository;
+    private final WorkerFunctionService workerFunctionsService;
 
-    @PostMapping(path = "/workerFunction") // Map ONLY POST Requests
-    public @ResponseBody String add(@RequestParam String name) {
-        return "Saved";
+    public WorkerFunctionController(WorkerFunctionService service) {
+        this.workerFunctionsService = service;
+    }
+
+    private void clickButton() {
+        add.setOnAction(event -> addEvent());
+        edit.setOnAction(event -> editEvent());
+        drop.setOnAction(event -> dropEvent());
+    }
+
+    private void dropEvent() {
+        WorkerFunctionDTO item =  workerFunctionsTable.getSelectionModel().getSelectedItem();
+        if (item == null) {
+            throw new ItemException("select record");
+        }
+
+        workerFunctionsService.drop(item);
+        workerFunctionsTable.setItems(FXCollections.observableList(workerFunctionsService.getAll()));
+    }
+
+    private void editEvent() {
+        WorkerFunctionDTO item =  workerFunctionsTable.getSelectionModel().getSelectedItem();
+        if (item == null) {
+            throw new ItemException("select record");
+        }
+
+        workerFunctionsService.edit(WorkerFunctionDTO.builder().name(name.getText()).build());
+        workerFunctionsTable.setItems(FXCollections.observableList(workerFunctionsService.getAll()));
+    }
+
+    private void addEvent() {
+        try {
+            WorkerFunctionDTO item = WorkerFunctionDTO.builder().name(name.getText()).build();
+            workerFunctionsService.add(item);
+            workerFunctionsTable.setItems(FXCollections.observableList(workerFunctionsService.getAll()));
+        }
+        catch (Exception e) {
+            System.err.println("factory add error");
+        }
     }
 }

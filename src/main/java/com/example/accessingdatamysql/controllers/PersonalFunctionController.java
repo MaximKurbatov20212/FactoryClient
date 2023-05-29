@@ -1,36 +1,68 @@
 package com.example.accessingdatamysql.controllers;
 
-import com.example.accessingdatamysql.dao.repo.PersonalFunctionRepository;
-import com.example.accessingdatamysql.dto.EquipmentDTO;
 import com.example.accessingdatamysql.dto.PersonalFunctionDTO;
+import com.example.accessingdatamysql.exception.ItemException;
+import com.example.accessingdatamysql.service.PersonalFunctionService;
+import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import net.rgielen.fxweaver.core.FxmlView;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 
 @Component
 @FxmlView("PersonalFunctions.fxml")
 public class PersonalFunctionController {
     @FXML
     private Button add;
-    @FXML private Button edit;
-    @FXML private Button drop;
-    @FXML private TextField name;
-    @FXML private TableView<PersonalFunctionDTO> personalFunctionsTable;
+    @FXML
+    private Button edit;
+    @FXML
+    private Button drop;
+    @FXML
+    private TextField name;
+    @FXML
+    private TableView<PersonalFunctionDTO> personalFunctionsTable;
+    private final PersonalFunctionService personalFunctionService;
 
-    @Autowired
-    private PersonalFunctionRepository personalFunctionRepository;
+    public PersonalFunctionController(PersonalFunctionService service) {
+        this.personalFunctionService = service;
+    }
 
-    @PostMapping(path = "/personalFunction") // Map ONLY POST Requests
-    public @ResponseBody String add(@RequestParam String name) {
-        return "Saved";
+    private void clickButton() {
+        add.setOnAction(event -> addEvent());
+        edit.setOnAction(event -> editEvent());
+        drop.setOnAction(event -> dropEvent());
+    }
+
+    private void dropEvent() {
+        PersonalFunctionDTO item = personalFunctionsTable.getSelectionModel().getSelectedItem();
+        if (item == null) {
+            throw new ItemException("select record");
+        }
+
+        personalFunctionService.drop(item);
+        personalFunctionsTable.setItems(FXCollections.observableList(personalFunctionService.getAll()));
+    }
+
+    private void editEvent() {
+        PersonalFunctionDTO item = personalFunctionsTable.getSelectionModel().getSelectedItem();
+        if (item == null) {
+            throw new ItemException("select record");
+        }
+
+        personalFunctionService.edit(PersonalFunctionDTO.builder().name(name.getText()).build());
+        personalFunctionsTable.setItems(FXCollections.observableList(personalFunctionService.getAll()));
+    }
+
+    private void addEvent() {
+        try {
+            PersonalFunctionDTO item = PersonalFunctionDTO.builder().name(name.getText()).build();
+            personalFunctionService.add(item);
+            personalFunctionsTable.setItems(FXCollections.observableList(personalFunctionService.getAll()));
+        } catch (Exception e) {
+            System.err.println("factory add error");
+        }
     }
 }

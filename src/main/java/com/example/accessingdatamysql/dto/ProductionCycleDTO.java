@@ -4,16 +4,22 @@ import com.example.accessingdatamysql.dao.entities.Brigade;
 import com.example.accessingdatamysql.dao.entities.Product;
 import com.example.accessingdatamysql.dao.entities.Site;
 import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class ProductionCycleDTO {
-
     @NotNull
     private Integer id;
     @NotNull
-    private Product product;
+    private ProductDTO product;
     @NotNull
-    private Site site;
+    private SiteDTO site;
     @NotNull
-
-    private Brigade brigade;
+    private BrigadeDTO brigade;
 }

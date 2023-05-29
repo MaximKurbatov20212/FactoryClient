@@ -4,6 +4,9 @@ import com.example.accessingdatamysql.dao.entities.ProductAttributeValue;
 import com.example.accessingdatamysql.dao.entities.ProductCategoryAttribute;
 import com.example.accessingdatamysql.dao.repo.ProductAttributeValueRepository;
 import com.example.accessingdatamysql.dto.*;
+import com.example.accessingdatamysql.exception.ItemException;
+import com.example.accessingdatamysql.service.ProductAttributeValueService;
+import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.TableView;
@@ -29,11 +32,76 @@ public class ProductAttributeValueController {
     @FXML private TableView<ProductCategoryAttributeDTO> productCategoryAttributesTable;
     @FXML private TableView<ProductAttributeValueDTO> productAttributeValueTable;
 
-    @Autowired
-    private ProductAttributeValueRepository productAttributeValueRepository;
+    private final ProductAttributeValueService productAttributeValueService;
 
-    @PostMapping(path = "/productAttributeValue") // Map ONLY POST Requests
-    public @ResponseBody String add(@RequestParam String name) {
-        return "Saved";
+    public ProductAttributeValueController(ProductAttributeValueService service) {
+        this.productAttributeValueService = service;
+    }
+
+    private void clickButton() {
+        add.setOnAction(event -> addEvent());
+        edit.setOnAction(event -> editEvent());
+        drop.setOnAction(event -> dropEvent());
+    }
+
+    private void dropEvent() {
+        ProductAttributeValueDTO item = productAttributeValueTable.getSelectionModel().getSelectedItem();
+        if (item == null) {
+            throw new ItemException("select record");
+        }
+
+        productAttributeValueService.drop(item);
+        productAttributeValueTable.setItems(FXCollections.observableList(productAttributeValueService.getAll()));
+    }
+
+    private void editEvent() {
+        ProductAttributeValueDTO productAttributeValueItem = productAttributeValueTable.getSelectionModel().getSelectedItem();
+        if (productAttributeValueItem == null) {
+            throw new ItemException("select record");
+        }
+
+        ProductCategoryAttributeDTO categoryItem = productCategoryAttributesTable.getSelectionModel().getSelectedItem();
+        if (categoryItem == null) {
+            throw new ItemException("select record");
+        }
+
+        ProductDTO productItem = productTable.getSelectionModel().getSelectedItem();
+        if (productItem == null) {
+            throw new ItemException("select record");
+        }
+
+        productAttributeValueService.edit(ProductAttributeValueDTO.builder()
+                .id(productAttributeValueItem.getId())
+                .product(productItem)
+                .value(value.getText())
+                .build());
+        productAttributeValueTable.setItems(FXCollections.observableList(productAttributeValueService.getAll()));
+    }
+
+    private void addEvent() {
+        try {
+            ProductAttributeValueDTO productAttributeValueItem = productAttributeValueTable.getSelectionModel().getSelectedItem();
+            if (productAttributeValueItem == null) {
+                throw new ItemException("select record");
+            }
+
+            ProductCategoryAttributeDTO categoryItem = productCategoryAttributesTable.getSelectionModel().getSelectedItem();
+            if (categoryItem == null) {
+                throw new ItemException("select record");
+            }
+
+            ProductDTO productItem = productTable.getSelectionModel().getSelectedItem();
+            if (productItem == null) {
+                throw new ItemException("select record");
+            }
+
+            productAttributeValueService.edit(ProductAttributeValueDTO.builder()
+                    .product(productItem)
+                    .value(value.getText())
+                    .build());
+            productAttributeValueTable.setItems(FXCollections.observableList(productAttributeValueService.getAll()));
+        } catch (Exception e) {
+            System.err.println("factory add error");
+        }
     }
 }

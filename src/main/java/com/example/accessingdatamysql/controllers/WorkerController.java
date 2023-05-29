@@ -1,20 +1,17 @@
 package com.example.accessingdatamysql.controllers;
 
 import com.example.accessingdatamysql.dao.repo.WorkerRepository;
-import com.example.accessingdatamysql.dto.BrigadeDTO;
-import com.example.accessingdatamysql.dto.WorkerDTO;
-import com.example.accessingdatamysql.dto.WorkerFunctionDTO;
+import com.example.accessingdatamysql.dto.*;
+import com.example.accessingdatamysql.exception.ItemException;
+import com.example.accessingdatamysql.service.BrigadeService;
+import com.example.accessingdatamysql.service.WorkerFunctionService;
+import com.example.accessingdatamysql.service.WorkerService;
+import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.TableView;
 import net.rgielen.fxweaver.core.FxmlView;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 
 @Component
 @FxmlView("Workers.fxml")
@@ -25,13 +22,95 @@ public class WorkerController {
     @FXML private Button drop;
     @FXML private TableView<BrigadeDTO> brigadesTable;
     @FXML private TableView<WorkerFunctionDTO> workerFunctionsTable;
+    @FXML private TableView<WorkerCategoryDTO> workerCategoriesTable;
     @FXML private TableView<WorkerDTO> workersTable;
+    private final WorkerService workersService;
 
-    @Autowired
-    private WorkerRepository workerRepository;
+    public WorkerController(WorkerService service) {
+        this.workersService = service;
+    }
 
-    @PostMapping(path = "/worker") // Map ONLY POST Requests
-    public @ResponseBody String add(@RequestParam String name) {
-        return "Saved";
+    private void clickButton() {
+        add.setOnAction(event -> addEvent());
+        edit.setOnAction(event -> editEvent());
+        drop.setOnAction(event -> dropEvent());
+    }
+
+    private void dropEvent() {
+        WorkerDTO item = workersTable.getSelectionModel().getSelectedItem();
+        if (item == null) {
+            throw new ItemException("select record");
+        }
+
+        workersService.drop(item);
+        workersTable.setItems(FXCollections.observableList(workersService.getAll()));
+    }
+
+    private void editEvent() {
+        WorkerDTO item = workersTable.getSelectionModel().getSelectedItem();
+        if (item == null) {
+            throw new ItemException("select record");
+        }
+
+        WorkerFunctionDTO funcItem = workerFunctionsTable.getSelectionModel().getSelectedItem();
+        if (funcItem == null) {
+            throw new ItemException("select record");
+        }
+
+        BrigadeDTO brigadeItem = brigadesTable.getSelectionModel().getSelectedItem();
+        if (brigadeItem == null) {
+            throw new ItemException("select record");
+        }
+
+        WorkerCategoryDTO categoryItem = workerCategoriesTable.getSelectionModel().getSelectedItem();
+        if (categoryItem == null) {
+            throw new ItemException("select record");
+        }
+
+        workersService.edit(WorkerDTO.builder()
+                .id(item.getId())
+                .brigade(brigadeItem)
+                .function(funcItem)
+                .category(categoryItem)
+                .build()
+        );
+
+        workersTable.setItems(FXCollections.observableList(workersService.getAll()));
+    }
+
+    private void addEvent() {
+        try {
+            WorkerDTO item = workersTable.getSelectionModel().getSelectedItem();
+            if (item == null) {
+                throw new ItemException("select record");
+            }
+
+            WorkerFunctionDTO funcItem = workerFunctionsTable.getSelectionModel().getSelectedItem();
+            if (funcItem == null) {
+                throw new ItemException("select record");
+            }
+
+            BrigadeDTO brigadeItem = brigadesTable.getSelectionModel().getSelectedItem();
+            if (brigadeItem == null) {
+                throw new ItemException("select record");
+            }
+
+            WorkerCategoryDTO categoryItem = workerCategoriesTable.getSelectionModel().getSelectedItem();
+            if (categoryItem == null) {
+                throw new ItemException("select record");
+            }
+
+            workersService.add(WorkerDTO.builder()
+                    .brigade(brigadeItem)
+                    .function(funcItem)
+                    .category(categoryItem)
+                    .build()
+            );
+
+            workersTable.setItems(FXCollections.observableList(workersService.getAll()));
+
+        } catch (Exception e) {
+            System.err.println("factory add error");
+        }
     }
 }

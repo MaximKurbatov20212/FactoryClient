@@ -1,19 +1,18 @@
 package com.example.accessingdatamysql.controllers;
 
-import com.example.accessingdatamysql.dao.repo.ProductAccountingRepository;
 import com.example.accessingdatamysql.dto.*;
+import com.example.accessingdatamysql.exception.ItemException;
+import com.example.accessingdatamysql.service.ProductAccountingService;
+import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.control.DatePicker;
 import javafx.scene.control.TableView;
-import javafx.scene.control.TextField;
 import net.rgielen.fxweaver.core.FxmlView;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+
+import java.time.ZoneId;
+import java.util.Date;
 
 @Component
 @FxmlView("ProductAccounting.fxml")
@@ -22,15 +21,86 @@ public class ProductAccountingController {
     private Button add;
     @FXML private Button edit;
     @FXML private Button drop;
-    @FXML private TextField date;
+    @FXML private DatePicker date;
     @FXML private TableView<ProductAccountingDTO> productAccountingTable;
     @FXML private TableView<ProductDTO> productsTable;
     @FXML private TableView<EventWithProductDTO> eventsWithProductTable;
-    @Autowired
-    private ProductAccountingRepository productAccountingRepository;
+    private final ProductAccountingService productAccountingService;
 
-    @PostMapping(path = "/productAccounting") // Map ONLY POST Requests
-    public @ResponseBody String add(@RequestParam String name) {
-        return "Saved";
+    public ProductAccountingController(ProductAccountingService service) {
+        this.productAccountingService = service;
+    }
+
+    private void clickButton() {
+        add.setOnAction(event -> addEvent());
+        edit.setOnAction(event -> editEvent());
+        drop.setOnAction(event -> dropEvent());
+    }
+
+    private void dropEvent() {
+        ProductAccountingDTO item = productAccountingTable.getSelectionModel().getSelectedItem();
+        if (item == null) {
+            throw new ItemException("select record");
+        }
+
+        productAccountingService.drop(item);
+        productAccountingTable.setItems(FXCollections.observableList(productAccountingService.getAll()));
+    }
+
+    private void editEvent() {
+        ProductAccountingDTO item = productAccountingTable.getSelectionModel().getSelectedItem();
+        if (item == null) {
+            throw new ItemException("select record");
+        }
+
+        ProductDTO productItem = productsTable.getSelectionModel().getSelectedItem();
+        if (productItem == null) {
+            throw new ItemException("select record");
+        }
+
+        EventWithProductDTO eventItem = eventsWithProductTable.getSelectionModel().getSelectedItem();
+        if (eventItem == null) {
+            throw new ItemException("select record");
+        }
+
+        productAccountingService.edit(ProductAccountingDTO.builder()
+                .id(productItem.getId())
+                        .person(productItem)
+                .event(eventItem)
+                .data(Date.from(date.getValue().atStartOfDay().atZone(ZoneId.systemDefault()).toInstant()))
+                .build()
+        );
+
+        productAccountingTable.setItems(FXCollections.observableList(productAccountingService.getAll()));
+    }
+
+    private void addEvent() {
+        try {
+            ProductAccountingDTO item = productAccountingTable.getSelectionModel().getSelectedItem();
+            if (item == null) {
+                throw new ItemException("select record");
+            }
+
+            ProductDTO productItem = productsTable.getSelectionModel().getSelectedItem();
+            if (productItem == null) {
+                throw new ItemException("select record");
+            }
+
+            EventWithProductDTO eventItem = eventsWithProductTable.getSelectionModel().getSelectedItem();
+            if (eventItem == null) {
+                throw new ItemException("select record");
+            }
+
+            productAccountingService.edit(ProductAccountingDTO.builder()
+                    .person(productItem)
+                    .event(eventItem)
+                    .data(Date.from(date.getValue().atStartOfDay().atZone(ZoneId.systemDefault()).toInstant()))
+                    .build()
+            );
+
+            productAccountingTable.setItems(FXCollections.observableList(productAccountingService.getAll()));
+        } catch (Exception e) {
+            System.err.println("factory add error");
+        }
     }
 }

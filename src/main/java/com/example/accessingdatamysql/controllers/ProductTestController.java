@@ -5,6 +5,9 @@ import com.example.accessingdatamysql.dto.EquipmentDTO;
 import com.example.accessingdatamysql.dto.LaboratoryDTO;
 import com.example.accessingdatamysql.dto.ProductDTO;
 import com.example.accessingdatamysql.dto.ProductTestDTO;
+import com.example.accessingdatamysql.exception.ItemException;
+import com.example.accessingdatamysql.service.ProductTestService;
+import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.TableView;
@@ -30,11 +33,77 @@ public class ProductTestController {
     @FXML private TableView<LaboratoryDTO> laboratoriesTable;
     @FXML private TableView<ProductTestDTO> productTestsTable;
 
-    @Autowired
-    private ProductTestRepository productTestRepository;
+    private final ProductTestService productTestService;
 
-    @PostMapping(path = "/productTest") // Map ONLY POST Requests
-    public @ResponseBody String add(@RequestParam String name) {
-        return "Saved";
+    public ProductTestController(ProductTestService service) {
+        this.productTestService = service;
+    }
+
+    private void clickButton() {
+        add.setOnAction(event -> addEvent());
+        edit.setOnAction(event -> editEvent());
+        drop.setOnAction(event -> dropEvent());
+    }
+
+    private void dropEvent() {
+        ProductTestDTO item = productTestsTable.getSelectionModel().getSelectedItem();
+        if (item == null) {
+            throw new ItemException("select record");
+        }
+
+        productTestService.drop(item);
+        productTestsTable.setItems(FXCollections.observableList(productTestService.getAll()));
+    }
+
+    private void editEvent() {
+        ProductTestDTO productTestItem = productTestsTable.getSelectionModel().getSelectedItem();
+        if (productTestItem == null) {
+            throw new ItemException("select productTest");
+        }
+
+        ProductDTO productItem = productsTable.getSelectionModel().getSelectedItem();
+        if (productItem == null) {
+            throw new ItemException("select expert");
+        }
+
+        LaboratoryDTO laboratoryItem  = laboratoriesTable.getSelectionModel().getSelectedItem();
+        if (laboratoryItem == null) {
+            throw new ItemException("select productTest");
+        }
+
+        productTestService.edit(ProductTestDTO.builder()
+                .id(productTestItem.getId())
+                .laboratory(laboratoryItem)
+                .product(productItem)
+                .build());
+        productTestsTable.setItems(FXCollections.observableList(productTestService.getAll()));
+    }
+
+    private void addEvent() {
+        try {
+          ProductTestDTO productTestItem = productTestsTable.getSelectionModel().getSelectedItem();
+        if (productTestItem == null) {
+            throw new ItemException("select productTest");
+        }
+
+        ProductDTO productItem = productsTable.getSelectionModel().getSelectedItem();
+        if (productItem == null) {
+            throw new ItemException("select expert");
+        }
+
+        LaboratoryDTO laboratoryItem  = laboratoriesTable.getSelectionModel().getSelectedItem();
+        if (laboratoryItem == null) {
+            throw new ItemException("select productTest");
+        }
+
+        productTestService.add(ProductTestDTO.builder()
+                .id(productTestItem.getId())
+                .laboratory(laboratoryItem)
+                .product(productItem)
+                .build());
+        productTestsTable.setItems(FXCollections.observableList(productTestService.getAll()));
+        } catch (Exception e) {
+            System.err.println("factory add error");
+        }
     }
 }

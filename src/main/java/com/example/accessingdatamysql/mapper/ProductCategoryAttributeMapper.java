@@ -3,10 +3,14 @@ package com.example.accessingdatamysql.mapper;
 import com.example.accessingdatamysql.dao.entities.ProductCategoryAttribute;
 import com.example.accessingdatamysql.dto.ProductAttributeValueDTO;
 import com.example.accessingdatamysql.dto.ProductCategoryAttributeDTO;
+import org.mapstruct.InjectionStrategy;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.ReportingPolicy;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel="spring",
+        injectionStrategy = InjectionStrategy.CONSTRUCTOR,
+        unmappedTargetPolicy = ReportingPolicy.WARN)
 public interface ProductCategoryAttributeMapper {
 
     @Mapping(target = "id", source = "id")

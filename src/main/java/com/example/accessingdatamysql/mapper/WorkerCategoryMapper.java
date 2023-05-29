@@ -3,10 +3,14 @@ package com.example.accessingdatamysql.mapper;
 import com.example.accessingdatamysql.dao.entities.WorkerCategory;
 import com.example.accessingdatamysql.dto.WorkerCategoryAttributeDTO;
 import com.example.accessingdatamysql.dto.WorkerCategoryDTO;
+import org.mapstruct.InjectionStrategy;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.ReportingPolicy;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel="spring",
+        injectionStrategy = InjectionStrategy.CONSTRUCTOR,
+        unmappedTargetPolicy = ReportingPolicy.WARN)
 public interface WorkerCategoryMapper {
 
     @Mapping(target = "id", source = "id")

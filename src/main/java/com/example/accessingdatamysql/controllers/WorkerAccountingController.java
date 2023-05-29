@@ -1,21 +1,20 @@
 package com.example.accessingdatamysql.controllers;
 
-import com.example.accessingdatamysql.dao.repo.WorkerAccountingRepository;
 import com.example.accessingdatamysql.dto.EventWithPeopleDTO;
 import com.example.accessingdatamysql.dto.WorkerAccountingDTO;
 import com.example.accessingdatamysql.dto.WorkerDTO;
+import com.example.accessingdatamysql.exception.ItemException;
+import com.example.accessingdatamysql.service.WorkerAccountingService;
+import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.control.DatePicker;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import net.rgielen.fxweaver.core.FxmlView;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import java.time.ZoneId;
+import java.sql.Date;
 
 @Component
 @FxmlView("WorkerAccounting.fxml")
@@ -25,16 +24,87 @@ public class WorkerAccountingController {
     @FXML private Button edit;
     @FXML private Button drop;
 
-    @FXML private TextField date;
+    @FXML private DatePicker date;
     @FXML private TableView<WorkerAccountingDTO> workerAccountingTable;
     @FXML private TableView<WorkerDTO> workersTable;
     @FXML private TableView<EventWithPeopleDTO> eventWithPeopleTable;
 
-    @Autowired
-    private WorkerAccountingRepository workerAccountingRepository;
+    private final WorkerAccountingService workerAccountingService;
 
-    @PostMapping(path = "/workerAccounting") // Map ONLY POST Requests
-    public @ResponseBody String add(@RequestParam String name) {
-        return "Saved";
+    public WorkerAccountingController(WorkerAccountingService service) {
+        this.workerAccountingService = service;
+    }
+
+    private void clickButton() {
+        add.setOnAction(event -> addEvent());
+        edit.setOnAction(event -> editEvent());
+        drop.setOnAction(event -> dropEvent());
+    }
+
+    private void dropEvent() {
+        WorkerAccountingDTO item = workerAccountingTable.getSelectionModel().getSelectedItem();
+        if (item == null) {
+            throw new ItemException("select record");
+        }
+
+        workerAccountingService.drop(item);
+        workerAccountingTable.setItems(FXCollections.observableList(workerAccountingService.getAll()));
+    }
+
+    private void editEvent() {
+        WorkerAccountingDTO item = workerAccountingTable.getSelectionModel().getSelectedItem();
+        if (item == null) {
+            throw new ItemException("select record");
+        }
+
+        WorkerDTO personalItem = workersTable.getSelectionModel().getSelectedItem();
+        if (personalItem == null) {
+            throw new ItemException("select record");
+        }
+
+        EventWithPeopleDTO eventItem = eventWithPeopleTable.getSelectionModel().getSelectedItem();
+        if (eventItem == null) {
+            throw new ItemException("select record");
+        }
+
+        workerAccountingService.edit(WorkerAccountingDTO.builder()
+                .id(personalItem.getId())
+                .person(personalItem)
+                .event(eventItem)
+                .data(Date.from(date.getValue().atStartOfDay().atZone(ZoneId.systemDefault()).toInstant()))
+                .build()
+        );
+
+        workerAccountingTable.setItems(FXCollections.observableList(workerAccountingService.getAll()));
+    }
+
+    private void addEvent() {
+        try {
+            WorkerAccountingDTO item = workerAccountingTable.getSelectionModel().getSelectedItem();
+            if (item == null) {
+                throw new ItemException("select record");
+            }
+
+            WorkerDTO personalItem = workersTable.getSelectionModel().getSelectedItem();
+            if (personalItem == null) {
+                throw new ItemException("select record");
+            }
+
+            EventWithPeopleDTO eventItem = eventWithPeopleTable.getSelectionModel().getSelectedItem();
+            if (eventItem == null) {
+                throw new ItemException("select record");
+            }
+
+            workerAccountingService.edit(WorkerAccountingDTO.builder()
+                    .person(personalItem)
+                    .event(eventItem)
+                    .data(Date.from(date.getValue().atStartOfDay().atZone(ZoneId.systemDefault()).toInstant()))
+                    .build()
+            );
+
+            workerAccountingTable.setItems(FXCollections.observableList(workerAccountingService.getAll()));
+        } catch (Exception e) {
+            System.err.println("factory add error");
+        }
     }
 }
